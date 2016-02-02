@@ -1,5 +1,7 @@
 package com.r2starbase.apo11o.coeus;
 
+import android.app.Fragment;
+import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -62,20 +64,30 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
+        Fragment frag;
+        Class fragClass;
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_home) {
-            // Handle the camera action
-        } else if (id == R.id.nav_status) {
+        switch (id) {
+            case R.id.nav_home:
+                fragClass = HomeFragment.class;
+                break;
+            case R.id.nav_ping:
+                fragClass = PingFragment.class;
+                break;
+            default:
+                fragClass = HomeFragment.class;
+        }
 
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
+        FragmentManager fManager = getFragmentManager();
+        try {
+            frag = (Fragment) fragClass.newInstance();
+            fManager.beginTransaction().replace(R.id.content_main, frag).commit();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

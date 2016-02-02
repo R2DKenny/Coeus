@@ -7,11 +7,12 @@
             android:icon="@drawable/ic_menu_camera"
             android:title="@string/home" />
         <item
-            android:id="@+id/nav_status"
+            android:id="@+id/nav_ping"
             android:icon="@drawable/ic_menu_gallery"
-            android:title="@string/network_status" />
+            android:title="@string/ping" />
     </group>
 
+    <!--
     <item android:title="Communicate">
         <menu>
             <item
@@ -24,5 +25,6 @@
                 android:title="Send" />
         </menu>
     </item>
+    -->
 
 </menu>
