@@ -30,7 +30,9 @@ public class DeviceListAdapter extends RecyclerView.Adapter<DeviceListAdapter.De
     public void onBindViewHolder(DeviceListHolder holder, int position) {
         DeviceInfo di = this.deviceList.get(position);
         holder.nameView.setText(di.getDeviceName());
-        holder.aliveFlagView.setText(di.isAlive() ? "Alive" : "Dead");
+        // TODO figure out how to reference resource
+        String isAlive = di.isAlive() ? "Connect" : "Disconnect";
+        holder.aliveFlagView.setText(isAlive);
         holder.lastAliveView.setText(di.getLastAlive().toString());
     }
 

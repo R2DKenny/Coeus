@@ -9,8 +9,6 @@
         android:layout_gravity="center"
         android:layout_width="match_parent"
         android:layout_height="100dp"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="10dp"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp" >
 
@@ -18,24 +16,54 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <TextView
-                android:id="@+id/device_name"
+            <ImageView
+                android:id="@+id/device_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                android:src="@drawable/ic_computer_dark"
+                android:contentDescription="@string/device_icon"/>
+
+            <LinearLayout
+                android:id="@+id/device_short_stat"
+                android:layout_toEndOf="@id/device_icon"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/device_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="20sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="10dp"
+                        android:text="@string/first_seen"/>
+
+                    <TextView
+                        android:id="@+id/device_last_alive"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+            </LinearLayout>
 
             <Button
-                android:layout_below="@id/device_name"
+                android:layout_toEndOf="@id/device_icon"
+                android:layout_below="@id/device_short_stat"
+                android:layout_alignParentBottom="true"
+                style="?android:attr/borderlessButtonStyle"
                 android:id="@+id/device_alive_flag"
-                android:layout_toStartOf="@id/device_alive_flag"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:focusable="false" />
-
-            <TextView
-                android:layout_below="@id/device_name"
-                android:layout_toEndOf="@id/device_alive_flag"
-                android:id="@+id/device_last_alive"
-                android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
         </RelativeLayout>
 

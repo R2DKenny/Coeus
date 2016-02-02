@@ -7,5 +7,13 @@
     <string name="home">Home</string>
     <string name="ping">Ping</string>
 
+    <string name="scan_label">Scan</string>
+    <string name="connect_label">Connect</string>
+    <string name="disconnect_label">Disconnect</string>
+
+    <string name="last_seen">Last seen: </string>
+    <string name="first_seen">First seen: </string>
+    <string name="device_icon">Device Icon</string>
+
     <string name="action_settings">Settings</string>
 </resources>
