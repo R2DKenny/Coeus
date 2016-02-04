@@ -2,7 +2,10 @@ package com.r2starbase.apo11o.coeus;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.Context;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -15,12 +18,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 public class CoeusActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, DeviceListFragment.DeviceListListener {
     public final static String TAG = "CoeusActivity";
     final static String COEUS_PREF = "COEUS_PREF";
     final static String TAG_STORE = "TAG_STORE";
     private SharedPreferences sp;
     private String currentTag = "";
+    private WifiP2pManager pManager;
+    private WifiP2pManager.Channel pChannel;
+    private WifiP2pBroadcastReceiver pReceiver;
+    private IntentFilter pFilter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,10 +47,24 @@ public class CoeusActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        // Setup Wifi P2P
+        setupWifiP2p();
+
         // Load previous state if any
         sp = getSharedPreferences(CoeusActivity.COEUS_PREF, MODE_PRIVATE);
         currentTag = sp.getString(CoeusActivity.TAG_STORE, HomeFragment.TAG);
         changeFragment(currentTag);
+    }
+
+    private void setupWifiP2p() {
+        pManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
+        pChannel = pManager.initialize(this, getMainLooper(), null);
+        pReceiver = new WifiP2pBroadcastReceiver(pManager, pChannel, this);
+        pFilter = new IntentFilter();
+        pFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
+        pFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
+        pFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
+        pFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
     }
 
     @Override
@@ -139,18 +160,39 @@ public class CoeusActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-        SharedPreferences.Editor editor = sp.edit();
-        editor.putString(CoeusActivity.TAG_STORE, currentTag);
-        editor.apply();
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
         sp = getSharedPreferences(CoeusActivity.COEUS_PREF, MODE_PRIVATE);
         currentTag = sp.getString(CoeusActivity.TAG_STORE, HomeFragment.TAG);
         changeFragment(currentTag);
+        // Wifi P2P stuff
+        registerReceiver(pReceiver, pFilter);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString(CoeusActivity.TAG_STORE, currentTag);
+        editor.apply();
+        // Wifi P2P stuff
+        unregisterReceiver(pReceiver);
+    }
+
+    @Override
+    public void startDiscovery() {
+        pManager.discoverPeers(pChannel, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+                DeviceListFragment dlFrag = (DeviceListFragment) getFragmentManager()
+                        .findFragmentByTag(DeviceListFragment.TAG);
+                dlFrag.stopRefresh();
+            }
+
+            @Override
+            public void onFailure(int reason) {
+
+            }
+        });
     }
 }
