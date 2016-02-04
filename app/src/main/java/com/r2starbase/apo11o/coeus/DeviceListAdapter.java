@@ -30,10 +30,7 @@ public class DeviceListAdapter extends RecyclerView.Adapter<DeviceListAdapter.De
     public void onBindViewHolder(DeviceListHolder holder, int position) {
         DeviceInfo di = this.deviceList.get(position);
         holder.nameView.setText(di.getDeviceName());
-        // TODO figure out how to reference resource
-        String isAlive = di.isAlive() ? "Connect" : "Disconnect";
-        holder.aliveFlagView.setText(isAlive);
-        holder.lastAliveView.setText(di.getLastAlive().toString());
+        holder.statusText.setText(di.getDeviceStatusMsg());
     }
 
     @Override
@@ -41,16 +38,30 @@ public class DeviceListAdapter extends RecyclerView.Adapter<DeviceListAdapter.De
         return deviceList.size();
     }
 
+    public void clear() {
+        this.deviceList.clear();
+        notifyDataSetChanged();
+    }
+
+    public void addAll(List<DeviceInfo> deviceList) {
+        this.deviceList.addAll(deviceList);
+        notifyDataSetChanged();
+    }
+
     public static class DeviceListHolder extends RecyclerView.ViewHolder {
-        protected TextView nameView;
-        protected Button aliveFlagView;
-        protected TextView lastAliveView;
+        private TextView nameView;
+        private TextView statusText;
+        private Button connectBtn;
+        private Button disconnectBtn;
+        private Button detailBtn;
 
         public DeviceListHolder(View itemView) {
             super(itemView);
             nameView = (TextView) itemView.findViewById(R.id.device_name);
-            aliveFlagView = (Button) itemView.findViewById(R.id.device_alive_flag);
-            lastAliveView = (TextView) itemView.findViewById(R.id.device_last_alive);
+            statusText = (TextView) itemView.findViewById(R.id.device_status);
+            connectBtn = (Button) itemView.findViewById(R.id.button_connect);
+            disconnectBtn = (Button) itemView.findViewById(R.id.button_disconnect);
+            detailBtn = (Button) itemView.findViewById(R.id.button_detail);
         }
     }
 }

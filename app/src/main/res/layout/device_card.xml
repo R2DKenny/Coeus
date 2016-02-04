@@ -47,24 +47,45 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="10dp"
-                        android:text="@string/first_seen"/>
+                        android:text="@string/label_status"/>
 
                     <TextView
-                        android:id="@+id/device_last_alive"
+                        android:id="@+id/device_status"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
                 </LinearLayout>
 
             </LinearLayout>
 
-            <Button
+            <LinearLayout
                 android:layout_toEndOf="@id/device_icon"
                 android:layout_below="@id/device_short_stat"
-                android:layout_alignParentBottom="true"
-                style="?android:attr/borderlessButtonStyle"
-                android:id="@+id/device_alive_flag"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <Button
+                    style="?android:attr/borderlessButtonStyle"
+                    android:id="@+id/button_connect"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:text="@string/label_connect"
+                    android:layout_weight="1"/>
+                <Button
+                    style="?android:attr/borderlessButtonStyle"
+                    android:id="@+id/button_disconnect"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:text="@string/label_disconnect"
+                    android:layout_weight="1"/>
+                <Button
+                    style="?android:attr/borderlessButtonStyle"
+                    android:id="@+id/button_detail"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:text="@string/label_detail"
+                    android:layout_weight="1"/>
+            </LinearLayout>
         </RelativeLayout>
 
     </android.support.v7.widget.CardView>

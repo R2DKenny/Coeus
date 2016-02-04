@@ -1,37 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/ping_fragment"
+<android.support.v4.widget.SwipeRefreshLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ping_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_marginStart="10dp"
-    android:layout_marginEnd="10dp" >
-
-    <LinearLayout
-        android:id="@+id/scan_handler"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/scan_btn"
-            android:layout_height="50dp"
-            android:layout_weight="3"
-            android:layout_width="match_parent"
-            android:text="@string/scan_label"/>
-
-        <ProgressBar
-            style="?android:progressBarStyleHorizontal"
-            android:id="@+id/scan_progress"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_weight="1" />
-    </LinearLayout>
+    android:layout_height="match_parent">
 
     <android.support.v7.widget.RecyclerView
-        android:layout_below="@id/scan_handler"
         android:id="@+id/ping_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
     </android.support.v7.widget.RecyclerView>
 
-</RelativeLayout>
+</android.support.v4.widget.SwipeRefreshLayout>

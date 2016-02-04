@@ -2,6 +2,7 @@ package com.r2starbase.apo11o.coeus;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -9,15 +10,23 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class MainActivity extends AppCompatActivity
+public class CoeusActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+    public final static String TAG = "CoeusActivity";
+    final static String COEUS_PREF = "COEUS_PREF";
+    final static String TAG_STORE = "TAG_STORE";
+    private SharedPreferences sp;
+    private String currentTag = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Setup layout
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -30,6 +39,11 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        // Load previous state if any
+        sp = getSharedPreferences(CoeusActivity.COEUS_PREF, MODE_PRIVATE);
+        currentTag = sp.getString(CoeusActivity.TAG_STORE, HomeFragment.TAG);
+        changeFragment(currentTag);
     }
 
     @Override
@@ -66,32 +80,77 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        Fragment frag;
+        String tag;
         Class fragClass;
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
         switch (id) {
             case R.id.nav_home:
+                tag = HomeFragment.TAG;
                 fragClass = HomeFragment.class;
                 break;
             case R.id.nav_ping:
-                fragClass = PingFragment.class;
+                tag = DeviceListFragment.TAG;
+                fragClass = DeviceListFragment.class;
                 break;
             default:
+                tag = HomeFragment.TAG;
                 fragClass = HomeFragment.class;
         }
 
-        FragmentManager fManager = getFragmentManager();
-        try {
-            frag = (Fragment) fragClass.newInstance();
-            fManager.beginTransaction().replace(R.id.content_main, frag).commit();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        changeFragment(tag, fragClass);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void changeFragment(String tag) {
+        Class fragClass;
+        switch (tag) {
+            case HomeFragment.TAG:
+                fragClass = HomeFragment.class;
+                break;
+            case DeviceListFragment.TAG:
+                fragClass = DeviceListFragment.class;
+                break;
+            default:
+                fragClass = HomeFragment.class;
+        }
+        changeFragment(tag, fragClass);
+    }
+
+    private void changeFragment(String tag, Class fragClass) {
+        Fragment frag;
+        FragmentManager fManager = getFragmentManager();
+        frag = fManager.findFragmentByTag(tag);
+        if (frag == null) {
+            try {
+                frag = (Fragment) fragClass.newInstance();
+                Log.d(CoeusActivity.TAG, tag + " Created");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        fManager.beginTransaction().replace(R.id.content_main, frag, tag)
+                .addToBackStack(currentTag).commit();
+        currentTag = tag;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString(CoeusActivity.TAG_STORE, currentTag);
+        editor.apply();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        sp = getSharedPreferences(CoeusActivity.COEUS_PREF, MODE_PRIVATE);
+        currentTag = sp.getString(CoeusActivity.TAG_STORE, HomeFragment.TAG);
+        changeFragment(currentTag);
     }
 }
