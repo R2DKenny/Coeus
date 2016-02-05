@@ -4,7 +4,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.List;
@@ -31,6 +30,7 @@ public class DeviceListAdapter extends RecyclerView.Adapter<DeviceListAdapter.De
         DeviceInfo di = this.deviceList.get(position);
         holder.nameView.setText(di.getDeviceName());
         holder.statusText.setText(di.getDeviceStatusMsg());
+        holder.addressText.setText(di.getDeviceAddress());
     }
 
     @Override
@@ -48,20 +48,16 @@ public class DeviceListAdapter extends RecyclerView.Adapter<DeviceListAdapter.De
         notifyDataSetChanged();
     }
 
-    public static class DeviceListHolder extends RecyclerView.ViewHolder {
+    public static class DeviceListHolder extends RecyclerView.ViewHolder{
         private TextView nameView;
         private TextView statusText;
-        private Button connectBtn;
-        private Button disconnectBtn;
-        private Button detailBtn;
+        private TextView addressText;
 
         public DeviceListHolder(View itemView) {
             super(itemView);
             nameView = (TextView) itemView.findViewById(R.id.device_name);
             statusText = (TextView) itemView.findViewById(R.id.device_status);
-            connectBtn = (Button) itemView.findViewById(R.id.button_connect);
-            disconnectBtn = (Button) itemView.findViewById(R.id.button_disconnect);
-            detailBtn = (Button) itemView.findViewById(R.id.button_detail);
+            addressText = (TextView) itemView.findViewById(R.id.device_address);
         }
     }
 }

@@ -12,6 +12,7 @@
     <string name="label_disconnect">Disconnect</string>
     <string name="label_detail">Detail</string>
     <string name="label_status">Status</string>
+    <string name="label_address">Address</string>
 
     <string name="last_seen">Last seen: </string>
     <string name="first_seen">First seen: </string>

@@ -10,17 +10,7 @@ public class DeviceInfo {
     private String deviceAddress;
     private int deviceStatus;
 
-
-    public DeviceInfo() {
-    }
-
     public DeviceInfo(WifiP2pDevice device) {
-        this.deviceName = device.deviceName;
-        this.deviceAddress = device.deviceAddress;
-        this.deviceStatus = device.status;
-    }
-
-    public void updateDevice(WifiP2pDevice device) {
         this.deviceName = device.deviceName;
         this.deviceAddress = device.deviceAddress;
         this.deviceStatus = device.status;

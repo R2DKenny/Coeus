@@ -37,7 +37,8 @@ public class WifiP2pBroadcastReceiver extends BroadcastReceiver {
         } else if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
             Log.d(WifiP2pBroadcastReceiver.TAG, "Wifi Peer Changed");
             if (pManager != null) {
-                pManager.requestPeers(pChannel, (WifiP2pManager.PeerListListener)pActivity.getFragmentManager().findFragmentByTag(DeviceListFragment.TAG));
+                pManager.requestPeers(pChannel, (WifiP2pManager.PeerListListener) pActivity.
+                        getFragmentManager().findFragmentByTag(DeviceListFragment.TAG));
             }
         } else if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)) {
             Log.d(WifiP2pBroadcastReceiver.TAG, "Wifi Connection Changed");

@@ -17,13 +17,16 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.util.Stack;
+
 public class CoeusActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, DeviceListFragment.DeviceListListener {
+        implements NavigationView.OnNavigationItemSelectedListener
+        , DeviceListFragment.DeviceListListener {
     public final static String TAG = "CoeusActivity";
     final static String COEUS_PREF = "COEUS_PREF";
     final static String TAG_STORE = "TAG_STORE";
     private SharedPreferences sp;
-    private String currentTag = "";
+    private Stack<String> currentTag = new Stack<>();
     private WifiP2pManager pManager;
     private WifiP2pManager.Channel pChannel;
     private WifiP2pBroadcastReceiver pReceiver;
@@ -52,8 +55,7 @@ public class CoeusActivity extends AppCompatActivity
 
         // Load previous state if any
         sp = getSharedPreferences(CoeusActivity.COEUS_PREF, MODE_PRIVATE);
-        currentTag = sp.getString(CoeusActivity.TAG_STORE, HomeFragment.TAG);
-        changeFragment(currentTag);
+        changeFragment(sp.getString(CoeusActivity.TAG_STORE, HomeFragment.TAG));
     }
 
     private void setupWifiP2p() {
@@ -70,8 +72,14 @@ public class CoeusActivity extends AppCompatActivity
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        String tag = currentTag.empty()? "": currentTag.peek();
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
+        } else if (getFragmentManager().getBackStackEntryCount() > 0 && tag.equals(DeviceDetailFragment.TAG)) {
+            getFragmentManager().popBackStack();
+            if (!currentTag.empty()) {
+                currentTag.pop();
+            }
         } else {
             super.onBackPressed();
         }
@@ -155,16 +163,15 @@ public class CoeusActivity extends AppCompatActivity
             }
         }
         fManager.beginTransaction().replace(R.id.content_main, frag, tag)
-                .addToBackStack(currentTag).commit();
-        currentTag = tag;
+                .addToBackStack(currentTag.empty()? null: currentTag.peek()).commit();
+        currentTag.push(tag);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         sp = getSharedPreferences(CoeusActivity.COEUS_PREF, MODE_PRIVATE);
-        currentTag = sp.getString(CoeusActivity.TAG_STORE, HomeFragment.TAG);
-        changeFragment(currentTag);
+        changeFragment(sp.getString(CoeusActivity.TAG_STORE, HomeFragment.TAG));
         // Wifi P2P stuff
         registerReceiver(pReceiver, pFilter);
     }
@@ -173,7 +180,9 @@ public class CoeusActivity extends AppCompatActivity
     protected void onPause() {
         super.onPause();
         SharedPreferences.Editor editor = sp.edit();
-        editor.putString(CoeusActivity.TAG_STORE, currentTag);
+        if (!currentTag.empty()) {
+            editor.putString(CoeusActivity.TAG_STORE, currentTag.peek());
+        }
         editor.apply();
         // Wifi P2P stuff
         unregisterReceiver(pReceiver);
@@ -194,5 +203,13 @@ public class CoeusActivity extends AppCompatActivity
 
             }
         });
+    }
+
+    @Override
+    public void showDeviceDetail(DeviceInfo di) {
+        FragmentManager fManager = getFragmentManager();
+        fManager.beginTransaction().replace(R.id.content_main, new DeviceDetailFragment(), DeviceDetailFragment.TAG)
+                .addToBackStack(currentTag.peek()).commit();
+        currentTag.push(DeviceDetailFragment.TAG);
     }
 }

@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +28,7 @@ public class DeviceListFragment extends Fragment implements WifiP2pManager.PeerL
 
     public interface DeviceListListener {
         void startDiscovery();
+        void showDeviceDetail(DeviceInfo di);
     }
 
     @Override
@@ -41,6 +43,16 @@ public class DeviceListFragment extends Fragment implements WifiP2pManager.PeerL
         dlAdapter = new DeviceListAdapter(dList);
         ladView.setAdapter(dlAdapter);
 
+        ladView.addOnItemTouchListener(new RecyclerViewItemClickListener(getActivity(),
+                new RecyclerViewItemClickListener.OnItemClickListener() {
+            @Override
+            public void onItemClick(View v, int position) {
+                Toast.makeText(getActivity(), "onItemClick", Toast.LENGTH_SHORT).show();
+                DeviceInfo di = dList.get(position);
+                ((DeviceListListener) getActivity()).showDeviceDetail(di);
+            }
+        }));
+
         srLayout = (SwipeRefreshLayout) root.findViewById(R.id.ping_layout);
         srLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -48,6 +60,8 @@ public class DeviceListFragment extends Fragment implements WifiP2pManager.PeerL
                 ((DeviceListListener)getActivity()).startDiscovery();
             }
         });
+
+        ((DeviceListListener) getActivity()).startDiscovery();
 
         Log.d(DeviceListFragment.TAG, "onCreateView");
 
@@ -71,5 +85,4 @@ public class DeviceListFragment extends Fragment implements WifiP2pManager.PeerL
         dlAdapter.clear();
         dlAdapter.addAll(tempList);
     }
-
 }
