@@ -5,6 +5,7 @@ import android.app.FragmentManager;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -16,12 +17,14 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import java.util.Stack;
 
 public class CoeusActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener
-        , DeviceListFragment.DeviceListListener {
+        , DeviceListFragment.DeviceListListener
+        , DeviceDetailFragment.DeviceDetailListener {
     public final static String TAG = "CoeusActivity";
     final static String COEUS_PREF = "COEUS_PREF";
     final static String TAG_STORE = "TAG_STORE";
@@ -72,7 +75,7 @@ public class CoeusActivity extends AppCompatActivity
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        String tag = currentTag.empty()? "": currentTag.peek();
+        String tag = currentTag.empty() ? "" : currentTag.peek();
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else if (getFragmentManager().getBackStackEntryCount() > 0 && tag.equals(DeviceDetailFragment.TAG)) {
@@ -163,7 +166,7 @@ public class CoeusActivity extends AppCompatActivity
             }
         }
         fManager.beginTransaction().replace(R.id.content_main, frag, tag)
-                .addToBackStack(currentTag.empty()? null: currentTag.peek()).commit();
+                .addToBackStack(currentTag.empty() ? null : currentTag.peek()).commit();
         currentTag.push(tag);
     }
 
@@ -208,8 +211,51 @@ public class CoeusActivity extends AppCompatActivity
     @Override
     public void showDeviceDetail(DeviceInfo di) {
         FragmentManager fManager = getFragmentManager();
-        fManager.beginTransaction().replace(R.id.content_main, new DeviceDetailFragment(), DeviceDetailFragment.TAG)
+        DeviceDetailFragment ddf = new DeviceDetailFragment();
+        ddf.setupDevice(di);
+        fManager.beginTransaction().replace(R.id.content_main,
+                ddf, DeviceDetailFragment.TAG)
                 .addToBackStack(currentTag.peek()).commit();
         currentTag.push(DeviceDetailFragment.TAG);
+    }
+
+    @Override
+    public void connect(WifiP2pConfig config) {
+        pManager.connect(pChannel, config, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+
+            }
+
+            @Override
+            public void onFailure(int reason) {
+                Toast.makeText(getApplicationContext(), "Connect failed", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    @Override
+    public void disconnect() {
+        pManager.removeGroup(pChannel, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(getApplicationContext(), "Disconnected", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(int reason) {
+
+            }
+        });
+    }
+
+    @Override
+    public void onChannelDisconnect() {
+
+    }
+
+    @Override
+    public void cancelDisconnect() {
+
     }
 }

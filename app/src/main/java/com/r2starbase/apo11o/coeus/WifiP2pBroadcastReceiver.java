@@ -3,6 +3,7 @@ package com.r2starbase.apo11o.coeus;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.net.NetworkInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.util.Log;
 
@@ -42,6 +43,14 @@ public class WifiP2pBroadcastReceiver extends BroadcastReceiver {
             }
         } else if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)) {
             Log.d(WifiP2pBroadcastReceiver.TAG, "Wifi Connection Changed");
+            if (pManager != null) {
+                NetworkInfo ni = intent.getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO);
+                if (ni.isConnected()) {
+                    DeviceDetailFragment ddf = (DeviceDetailFragment) this.pActivity.getFragmentManager()
+                            .findFragmentByTag(DeviceDetailFragment.TAG);
+                    pManager.requestConnectionInfo(pChannel, ddf);
+                }
+            }
         } else if (WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION.equals(action)) {
             Log.d(WifiP2pBroadcastReceiver.TAG, "Wifi Device Changed");
         }

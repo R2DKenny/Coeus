@@ -9,8 +9,10 @@ public class DeviceInfo {
     private String deviceName;
     private String deviceAddress;
     private int deviceStatus;
+    private WifiP2pDevice device;
 
     public DeviceInfo(WifiP2pDevice device) {
+        this.device = device;
         this.deviceName = device.deviceName;
         this.deviceAddress = device.deviceAddress;
         this.deviceStatus = device.status;
@@ -54,6 +56,10 @@ public class DeviceInfo {
                 msg = "Unknown";
         }
         return msg;
+    }
+
+    public WifiP2pDevice getDevice() {
+        return this.device;
     }
 
     public void setDeviceName(String deviceName) {

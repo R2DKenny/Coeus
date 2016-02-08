@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="150dp"
         android:src="@drawable/ic_phone_android"
-        android:contentDescription="@string/label_address"/>
+        android:contentDescription="@string/label_mac"/>
 
     <LinearLayout
         android:layout_below="@id/device_detail_icon"
@@ -33,6 +33,14 @@
             android:layout_weight="1"
             style="?android:attr/borderlessButtonStyle"
             android:text="@string/label_disconnect"/>
+
+        <Button
+            android:id="@+id/device_transfer_btn"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            style="?android:attr/borderlessButtonStyle"
+            android:text="@string/label_transfer"/>
     </LinearLayout>
 
     <TextView
@@ -40,7 +48,8 @@
         android:layout_below="@id/device_detail_btns"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="30sp"/>
+        android:textSize="30sp"
+        android:text="@string/stub_name"/>
 
     <LinearLayout
         android:layout_below="@id/device_detail_name"
@@ -50,18 +59,60 @@
         android:orientation="horizontal">
 
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/label_address"/>
+            android:layout_marginEnd="5dp"
+            android:text="@string/label_mac"/>
 
         <TextView
             android:id="@+id/device_detail_address"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:text="@string/stub_mac"/>
     </LinearLayout>
 
     <LinearLayout
         android:layout_below="@id/device_detail_address_row"
+        android:id="@+id/device_detail_ip_row"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:text="@string/label_ip"/>
+
+        <TextView
+            android:id="@+id/device_detail_ip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/stub_ip"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_below="@id/device_detail_ip_row"
+        android:id="@+id/device_detail_go_row"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:text="@string/label_go"/>
+
+        <TextView
+            android:id="@+id/device_go_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/stub_go"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_below="@id/device_detail_go_row"
         android:id="@+id/device_detail_status_row"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -70,13 +121,19 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
             android:text="@string/label_status"/>
-
 
         <TextView
             android:id="@+id/device_detail_status"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:text="@string/stub_status"/>
     </LinearLayout>
 
+    <TextView
+        android:layout_below="@id/device_detail_go_row"
+        android:id="@+id/device_detail_other"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 </RelativeLayout>
