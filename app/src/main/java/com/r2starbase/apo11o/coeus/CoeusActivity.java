@@ -26,14 +26,16 @@ public class CoeusActivity extends AppCompatActivity
         , DeviceListFragment.DeviceListListener
         , DeviceDetailFragment.DeviceDetailListener {
     public final static String TAG = "CoeusActivity";
-    final static String COEUS_PREF = "COEUS_PREF";
-    final static String TAG_STORE = "TAG_STORE";
+    public final static String COEUS_PREF = "COEUS_PREF";
+    public final static String TAG_STORE = "TAG_STORE";
+    public final static int SERVER_PORT = 8988;
     private SharedPreferences sp;
     private Stack<String> currentTag = new Stack<>();
     private WifiP2pManager pManager;
     private WifiP2pManager.Channel pChannel;
     private WifiP2pBroadcastReceiver pReceiver;
     private IntentFilter pFilter;
+    private boolean isWifiP2pEnabled;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,9 +64,12 @@ public class CoeusActivity extends AppCompatActivity
     }
 
     private void setupWifiP2p() {
+        // Setup the Wifi P2P manager & channel
         pManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
         pChannel = pManager.initialize(this, getMainLooper(), null);
+        // Setup the broadcast receiver
         pReceiver = new WifiP2pBroadcastReceiver(pManager, pChannel, this);
+        // Create the intent filter
         pFilter = new IntentFilter();
         pFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
         pFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
@@ -72,18 +77,27 @@ public class CoeusActivity extends AppCompatActivity
         pFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
     }
 
+    public void setIsWifiP2pEnabled(boolean isWifiP2pEnabled) {
+        this.isWifiP2pEnabled = isWifiP2pEnabled;
+    }
+
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         String tag = currentTag.empty() ? "" : currentTag.peek();
+
         if (drawer.isDrawerOpen(GravityCompat.START)) {
+            // Case if the drawer is open
             drawer.closeDrawer(GravityCompat.START);
         } else if (getFragmentManager().getBackStackEntryCount() > 0 && tag.equals(DeviceDetailFragment.TAG)) {
+            // Case if we have the detail fragment open
+            // Without the TAG check, it'll cycle through the Home and List fragments in some cases
             getFragmentManager().popBackStack();
             if (!currentTag.empty()) {
                 currentTag.pop();
             }
         } else {
+            // Default case
             super.onBackPressed();
         }
     }
@@ -113,25 +127,21 @@ public class CoeusActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         String tag;
-        Class fragClass;
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
         switch (id) {
             case R.id.nav_home:
                 tag = HomeFragment.TAG;
-                fragClass = HomeFragment.class;
                 break;
             case R.id.nav_ping:
                 tag = DeviceListFragment.TAG;
-                fragClass = DeviceListFragment.class;
                 break;
             default:
                 tag = HomeFragment.TAG;
-                fragClass = HomeFragment.class;
         }
 
-        changeFragment(tag, fragClass);
+        changeFragment(tag);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -173,6 +183,7 @@ public class CoeusActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
+        // Load the fragment that was last visible
         sp = getSharedPreferences(CoeusActivity.COEUS_PREF, MODE_PRIVATE);
         changeFragment(sp.getString(CoeusActivity.TAG_STORE, HomeFragment.TAG));
         // Wifi P2P stuff
@@ -182,6 +193,7 @@ public class CoeusActivity extends AppCompatActivity
     @Override
     protected void onPause() {
         super.onPause();
+        // Save the current fragment tag if any
         SharedPreferences.Editor editor = sp.edit();
         if (!currentTag.empty()) {
             editor.putString(CoeusActivity.TAG_STORE, currentTag.peek());
@@ -196,9 +208,6 @@ public class CoeusActivity extends AppCompatActivity
         pManager.discoverPeers(pChannel, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
-                DeviceListFragment dlFrag = (DeviceListFragment) getFragmentManager()
-                        .findFragmentByTag(DeviceListFragment.TAG);
-                dlFrag.stopRefresh();
             }
 
             @Override
@@ -212,26 +221,28 @@ public class CoeusActivity extends AppCompatActivity
     public void showDeviceDetail(DeviceInfo di) {
         FragmentManager fManager = getFragmentManager();
         DeviceDetailFragment ddf = new DeviceDetailFragment();
-        ddf.setupDevice(di);
-        fManager.beginTransaction().replace(R.id.content_main,
-                ddf, DeviceDetailFragment.TAG)
+        ddf.setDevice(di);
+        fManager.beginTransaction().replace(R.id.content_main, ddf, DeviceDetailFragment.TAG)
                 .addToBackStack(currentTag.peek()).commit();
         currentTag.push(DeviceDetailFragment.TAG);
     }
 
     @Override
     public void connect(WifiP2pConfig config) {
-        pManager.connect(pChannel, config, new WifiP2pManager.ActionListener() {
-            @Override
-            public void onSuccess() {
+        if (this.isWifiP2pEnabled) {
+            pManager.connect(pChannel, config, new WifiP2pManager.ActionListener() {
+                @Override
+                public void onSuccess() {
+                }
 
-            }
-
-            @Override
-            public void onFailure(int reason) {
-                Toast.makeText(getApplicationContext(), "Connect failed", Toast.LENGTH_SHORT).show();
-            }
-        });
+                @Override
+                public void onFailure(int reason) {
+                    Toast.makeText(getApplicationContext(), "Connect failed", Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            Toast.makeText(this, "Wifi P2P disabled", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
@@ -247,15 +258,5 @@ public class CoeusActivity extends AppCompatActivity
 
             }
         });
-    }
-
-    @Override
-    public void onChannelDisconnect() {
-
-    }
-
-    @Override
-    public void cancelDisconnect() {
-
     }
 }

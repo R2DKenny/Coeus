@@ -32,22 +32,26 @@ public class WifiP2pBroadcastReceiver extends BroadcastReceiver {
             int state = intent.getIntExtra(WifiP2pManager.EXTRA_WIFI_STATE, -1);
             if (state == WifiP2pManager.WIFI_P2P_STATE_ENABLED) {
                 Log.d(WifiP2pBroadcastReceiver.TAG, "Wifi P2P Enabled");
+                this.pActivity.setIsWifiP2pEnabled(true);
             } else {
                 Log.d(WifiP2pBroadcastReceiver.TAG, "Wifi P2P Disabled");
+                this.pActivity.setIsWifiP2pEnabled(false);
             }
         } else if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
             Log.d(WifiP2pBroadcastReceiver.TAG, "Wifi Peer Changed");
             if (pManager != null) {
-                pManager.requestPeers(pChannel, (WifiP2pManager.PeerListListener) pActivity.
-                        getFragmentManager().findFragmentByTag(DeviceListFragment.TAG));
+                pManager.requestPeers(pChannel, (WifiP2pManager.PeerListListener) pActivity
+                        .getFragmentManager().findFragmentByTag(DeviceListFragment.TAG));
             }
         } else if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)) {
             Log.d(WifiP2pBroadcastReceiver.TAG, "Wifi Connection Changed");
             if (pManager != null) {
                 NetworkInfo ni = intent.getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO);
                 if (ni.isConnected()) {
-                    DeviceDetailFragment ddf = (DeviceDetailFragment) this.pActivity.getFragmentManager()
-                            .findFragmentByTag(DeviceDetailFragment.TAG);
+                    Log.d(WifiP2pBroadcastReceiver.TAG, "isConnected check passed");
+                    DeviceDetailFragment ddf = (DeviceDetailFragment) pActivity
+                            .getFragmentManager().findFragmentByTag(DeviceDetailFragment.TAG);
+                    Log.d(WifiP2pBroadcastReceiver.TAG, "Is null: " + (ddf == null));
                     pManager.requestConnectionInfo(pChannel, ddf);
                 }
             }

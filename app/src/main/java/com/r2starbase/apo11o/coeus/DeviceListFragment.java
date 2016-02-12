@@ -12,7 +12,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,16 +42,17 @@ public class DeviceListFragment extends Fragment implements WifiP2pManager.PeerL
         dlAdapter = new DeviceListAdapter(dList);
         ladView.setAdapter(dlAdapter);
 
+        // Setup the list item click callback
         ladView.addOnItemTouchListener(new RecyclerViewItemClickListener(getActivity(),
                 new RecyclerViewItemClickListener.OnItemClickListener() {
             @Override
             public void onItemClick(View v, int position) {
-                Toast.makeText(getActivity(), "onItemClick", Toast.LENGTH_SHORT).show();
                 DeviceInfo di = dList.get(position);
                 ((DeviceListListener) getActivity()).showDeviceDetail(di);
             }
         }));
 
+        // Setup the swipe down to refresh callback
         srLayout = (SwipeRefreshLayout) root.findViewById(R.id.ping_layout);
         srLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -61,6 +61,7 @@ public class DeviceListFragment extends Fragment implements WifiP2pManager.PeerL
             }
         });
 
+        // Automatically start discovery at the beginning
         ((DeviceListListener) getActivity()).startDiscovery();
 
         Log.d(DeviceListFragment.TAG, "onCreateView");
@@ -68,15 +69,13 @@ public class DeviceListFragment extends Fragment implements WifiP2pManager.PeerL
         return root;
     }
 
-    public void stopRefresh() {
-        srLayout.setRefreshing(false);
-    }
-
     @Override
     public void onPeersAvailable(WifiP2pDeviceList peers) {
         reloadPeers(peers);
+        srLayout.setRefreshing(false);
     }
 
+    // Re-populate the peer array
     public void reloadPeers(WifiP2pDeviceList newList) {
         List<DeviceInfo> tempList = new ArrayList<>();
         for (WifiP2pDevice dev: newList.getDeviceList()) {
