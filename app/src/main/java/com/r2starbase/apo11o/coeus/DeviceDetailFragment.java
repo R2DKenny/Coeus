@@ -61,7 +61,7 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.setType("*/*");
+                intent.setType("image/*");
                 startActivityForResult(intent, DeviceDetailFragment.FILE_CHOOSE_CODE);
             }
         });
@@ -97,13 +97,14 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (this.pInfo != null) {
             Uri uri = data.getData();
+            TextView tv = (TextView) detailView.findViewById(R.id.device_detail_transfer_status);
+            tv.setText("Sending: " + uri);
             Intent sIntent = new Intent(getActivity(), ContentTransferService.class);
             sIntent.setAction(ContentTransferService.ACTION_SEND_FILE);
             sIntent.putExtra(ContentTransferService.EXTRAS_FILE_PATH, uri.toString());
             sIntent.putExtra(ContentTransferService.EXTRAS_GROUP_OWNER_ADDRESS,
                     pInfo.groupOwnerAddress.getAddress());
             sIntent.putExtra(ContentTransferService.EXTRAS_GROUP_OWNER_PORT, CoeusActivity.SERVER_PORT);
-            Toast.makeText(getActivity(), "Sending: " + uri.toString(), Toast.LENGTH_SHORT).show();
             getActivity().startService(sIntent);
         } else {
             Toast.makeText(getActivity(), "Wifi P2P info missing", Toast.LENGTH_SHORT).show();
@@ -117,6 +118,7 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
         updateNetworkDetail(this.pInfo);
 
         if (info.groupFormed && info.isGroupOwner) {
+            Toast.makeText(getActivity(), "FileServer started", Toast.LENGTH_SHORT).show();
             new FileServerAsyncTask(getActivity()).execute();
         }
     }

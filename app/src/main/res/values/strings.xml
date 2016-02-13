@@ -14,14 +14,16 @@
     <string name="label_transfer">Transfer</string>
     <string name="label_status">Status:</string>
     <string name="label_mac">MAC:</string>
-    <string name="label_ip">IP: </string>
+    <string name="label_ip">Owner IP: </string>
     <string name="label_go">Group Owner:</string>
+    <string name="label_transfer_status">Transfer Status:</string>
     
     <string name="stub_mac">Stub MAC</string>
     <string name="stub_ip">Stub IP</string>
     <string name="stub_name">Stub Name</string>
     <string name="stub_status">Stub Status</string>
     <string name="stub_go">Stub Group Owner</string>
+    <string name="stub_transfer_status">No activity</string>
 
     <string name="yes">Yes</string>
     <string name="no">No</string>

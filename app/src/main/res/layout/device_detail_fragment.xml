@@ -132,8 +132,28 @@
             android:text="@string/stub_status"/>
     </LinearLayout>
 
-    <TextView
+    <LinearLayout
         android:layout_below="@id/device_detail_status_row"
+        android:id="@+id/device_transfer_status_row"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:text="@string/label_transfer_status"/>
+
+        <TextView
+            android:id="@+id/device_detail_transfer_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/stub_transfer_status"/>
+    </LinearLayout>
+
+    <TextView
+        android:layout_below="@id/device_transfer_status_row"
         android:id="@+id/device_detail_other"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />

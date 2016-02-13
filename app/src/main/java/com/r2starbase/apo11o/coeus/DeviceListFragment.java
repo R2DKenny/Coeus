@@ -24,6 +24,7 @@ public class DeviceListFragment extends Fragment implements WifiP2pManager.PeerL
     private SwipeRefreshLayout srLayout;
     private DeviceListAdapter dlAdapter;
     private List<DeviceInfo> dList = new ArrayList<>();
+    private WifiP2pDevice localDevice = new WifiP2pDevice();
 
     public interface DeviceListListener {
         void startDiscovery();
@@ -32,7 +33,7 @@ public class DeviceListFragment extends Fragment implements WifiP2pManager.PeerL
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.ping_fragment, container, false);
+        View root = inflater.inflate(R.layout.device_list_fragment, container, false);
         RecyclerView ladView = (RecyclerView) root.findViewById(R.id.ping_view);
 
         ladView.setHasFixedSize(true);

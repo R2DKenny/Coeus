@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,7 +21,6 @@ public class ContentTransferService extends IntentService {
     public static final String TAG = "ContentTransferService";
     public static final int SOCKET_TIMEOUT = 5000;
     public static final String ACTION_SEND_FILE = "com.r2starbase.apo11o.coeus.SEND_FILE";
-    public static final String ACTION_SEND_TEXT = "com.r2starbase.apo11o.coeus.SEND_TEXT";
     public static final String EXTRAS_FILE_PATH = "file_url";
     public static final String EXTRAS_GROUP_OWNER_ADDRESS = "go_host";
     public static final String EXTRAS_GROUP_OWNER_PORT = "go_port";
@@ -35,12 +35,14 @@ public class ContentTransferService extends IntentService {
         String action = intent.getAction();
 
         if (action.equals(ContentTransferService.ACTION_SEND_FILE)) {
+            Toast.makeText(ctx, "Sending file!", Toast.LENGTH_SHORT).show();
             String fileUri = intent.getExtras().getString(ContentTransferService.EXTRAS_FILE_PATH);
             String host = intent.getExtras().getString(ContentTransferService.EXTRAS_GROUP_OWNER_ADDRESS);
             int port = intent.getExtras().getInt(ContentTransferService.EXTRAS_GROUP_OWNER_PORT);
             Socket sock = new Socket();
 
             try {
+                Log.d(ContentTransferService.TAG, "Starting file transfer...");
                 sock.bind(null);
                 sock.connect(new InetSocketAddress(host, port), ContentTransferService.SOCKET_TIMEOUT);
                 OutputStream oStream = sock.getOutputStream();
@@ -51,6 +53,7 @@ public class ContentTransferService extends IntentService {
                 if (iStream != null) {
                     iStream.close();
                 }
+                Log.d(ContentTransferService.TAG, "Finished file transfer!");
             } catch (IllegalArgumentException | IOException e) {
                 Log.d(ContentTransferService.TAG, e.getMessage());
             } finally {

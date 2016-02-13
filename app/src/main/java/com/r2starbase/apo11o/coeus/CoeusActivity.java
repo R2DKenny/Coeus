@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.wifi.p2p.WifiP2pConfig;
+import android.net.wifi.p2p.WifiP2pGroup;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -26,11 +27,7 @@ public class CoeusActivity extends AppCompatActivity
         , DeviceListFragment.DeviceListListener
         , DeviceDetailFragment.DeviceDetailListener {
     public final static String TAG = "CoeusActivity";
-    public final static String COEUS_PREF = "COEUS_PREF";
-    public final static String TAG_STORE = "TAG_STORE";
     public final static int SERVER_PORT = 8988;
-    private SharedPreferences sp;
-    private Stack<String> currentTag = new Stack<>();
     private WifiP2pManager pManager;
     private WifiP2pManager.Channel pChannel;
     private WifiP2pBroadcastReceiver pReceiver;
@@ -40,7 +37,6 @@ public class CoeusActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         // Setup layout
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -58,9 +54,8 @@ public class CoeusActivity extends AppCompatActivity
         // Setup Wifi P2P
         setupWifiP2p();
 
-        // Load previous state if any
-        sp = getSharedPreferences(CoeusActivity.COEUS_PREF, MODE_PRIVATE);
-        changeFragment(sp.getString(CoeusActivity.TAG_STORE, HomeFragment.TAG));
+        // TODO Load previous state if any
+        changeFragment(DeviceListFragment.TAG, getFragment(DeviceListFragment.TAG));
     }
 
     private void setupWifiP2p() {
@@ -84,18 +79,13 @@ public class CoeusActivity extends AppCompatActivity
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        String tag = currentTag.empty() ? "" : currentTag.peek();
 
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             // Case if the drawer is open
             drawer.closeDrawer(GravityCompat.START);
-        } else if (getFragmentManager().getBackStackEntryCount() > 0 && tag.equals(DeviceDetailFragment.TAG)) {
+        } else if (getFragmentManager().getBackStackEntryCount() > 1) {
             // Case if we have the detail fragment open
-            // Without the TAG check, it'll cycle through the Home and List fragments in some cases
             getFragmentManager().popBackStack();
-            if (!currentTag.empty()) {
-                currentTag.pop();
-            }
         } else {
             // Default case
             super.onBackPressed();
@@ -141,14 +131,16 @@ public class CoeusActivity extends AppCompatActivity
                 tag = HomeFragment.TAG;
         }
 
-        changeFragment(tag);
+        changeFragment(tag, getFragment(tag));
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
-    private void changeFragment(String tag) {
+    private Fragment getFragment(String tag) {
+        Fragment frag;
+        FragmentManager fManager = getFragmentManager();
         Class fragClass;
         switch (tag) {
             case HomeFragment.TAG:
@@ -157,15 +149,12 @@ public class CoeusActivity extends AppCompatActivity
             case DeviceListFragment.TAG:
                 fragClass = DeviceListFragment.class;
                 break;
+            case DeviceDetailFragment.TAG:
+                fragClass = DeviceDetailFragment.class;
+                break;
             default:
                 fragClass = HomeFragment.class;
         }
-        changeFragment(tag, fragClass);
-    }
-
-    private void changeFragment(String tag, Class fragClass) {
-        Fragment frag;
-        FragmentManager fManager = getFragmentManager();
         frag = fManager.findFragmentByTag(tag);
         if (frag == null) {
             try {
@@ -175,17 +164,18 @@ public class CoeusActivity extends AppCompatActivity
                 e.printStackTrace();
             }
         }
+        return frag;
+    }
+
+    private void changeFragment(String tag, Fragment frag) {
+        FragmentManager fManager = getFragmentManager();
         fManager.beginTransaction().replace(R.id.content_main, frag, tag)
-                .addToBackStack(currentTag.empty() ? null : currentTag.peek()).commit();
-        currentTag.push(tag);
+                .addToBackStack(tag).commit();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        // Load the fragment that was last visible
-        sp = getSharedPreferences(CoeusActivity.COEUS_PREF, MODE_PRIVATE);
-        changeFragment(sp.getString(CoeusActivity.TAG_STORE, HomeFragment.TAG));
         // Wifi P2P stuff
         registerReceiver(pReceiver, pFilter);
     }
@@ -193,12 +183,6 @@ public class CoeusActivity extends AppCompatActivity
     @Override
     protected void onPause() {
         super.onPause();
-        // Save the current fragment tag if any
-        SharedPreferences.Editor editor = sp.edit();
-        if (!currentTag.empty()) {
-            editor.putString(CoeusActivity.TAG_STORE, currentTag.peek());
-        }
-        editor.apply();
         // Wifi P2P stuff
         unregisterReceiver(pReceiver);
     }
@@ -219,12 +203,9 @@ public class CoeusActivity extends AppCompatActivity
 
     @Override
     public void showDeviceDetail(DeviceInfo di) {
-        FragmentManager fManager = getFragmentManager();
-        DeviceDetailFragment ddf = new DeviceDetailFragment();
+        DeviceDetailFragment ddf = (DeviceDetailFragment)getFragment(DeviceDetailFragment.TAG);
         ddf.setDevice(di);
-        fManager.beginTransaction().replace(R.id.content_main, ddf, DeviceDetailFragment.TAG)
-                .addToBackStack(currentTag.peek()).commit();
-        currentTag.push(DeviceDetailFragment.TAG);
+        changeFragment(DeviceDetailFragment.TAG, ddf);
     }
 
     @Override
